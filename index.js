@@ -8,7 +8,10 @@ app.use(Express.static('public'))
 app.use(Express.json({ limit: '50mb' }));
 
 app.get('/', (req, res) => {
-    console.log("in res")
+    res.json(data)
+})
+
+app.get('/getTerritory', (req, res) => {
     res.json(data)
 })
 
