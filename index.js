@@ -1,3 +1,4 @@
 import data from "./scripts/geraTerritorio.js";
 
-console.log(data);
+
+console.log(data)
