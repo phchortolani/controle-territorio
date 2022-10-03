@@ -1,0 +1,17 @@
+{
+  "name": "controle-territorio",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "devDependencies": {},
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "excel-date-to-js": "^1.1.5",
+    "xlsx": "^0.18.5"
+  }
+}
