@@ -8,11 +8,11 @@ app.use(Express.static('public'))
 
 
 app.get('/', (req, res) => {
+    console.log("in res")
     res.json(data)
 })
 
 app.listen(port, () => {
     console.log(`server is running`)
-    console.log(data)
 })
 
