@@ -24,7 +24,7 @@ app.get('/getTerritory/:id', (req, res) => {
         if (!err) {
             res.sendFile(__dirname + `/public/assets/${req.params.id}.png`);
         } else {
-            res.send(null);
+            res.sendFile(__dirname + `/public/assets/notimg.png`);
         }
     });
 
