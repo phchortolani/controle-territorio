@@ -2,6 +2,7 @@ import data from "./public/scripts/geraTerritorio.js";
 import Express from "express";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -18,7 +19,16 @@ app.get('/', (req, res) => {
 })
 
 app.get('/getTerritory/:id', (req, res) => {
-    res.sendFile(__dirname + `/public/assets/${req.params.id}.png`);
+
+    fs.access(__dirname + `/public/assets/${req.params.id}.png`, fs.constants.F_OK, (err) => {
+        if (!err) {
+            res.sendFile(__dirname + `/public/assets/${req.params.id}.png`);
+        } else {
+            res.send(null);
+        }
+    });
+
+
 })
 
 app.listen(port, () => {
