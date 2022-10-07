@@ -1,4 +1,4 @@
-import data from "./public/scripts/geraTerritorio.js";
+import { getData, addRow } from "./public/scripts/geraTerritorio.js";
 import Express from "express";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -15,7 +15,7 @@ app.use(Express.static('public'))
 app.use(Express.json({ limit: '50mb' }));
 
 app.get('/', (req, res) => {
-    res.json(data)
+    res.json(getData())
 })
 
 app.get('/getTerritory/:id', (req, res) => {
@@ -28,8 +28,19 @@ app.get('/getTerritory/:id', (req, res) => {
         }
     });
 
+})
+
+app.get('/addRow', (req, res) => {
+
+    addRow();
+
+    res.sendStatus(200);
 
 })
+
+
+
+
 
 app.listen(port, () => {
     console.log(`server is running: ${port}`)
