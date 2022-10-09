@@ -3,11 +3,10 @@ import gts from 'excel-date-to-js'
 const { readFile, utils, writeFile } = xlsx;
 const { getJsDateFromExcel } = gts;
 
-const file = readFile('./sheet/CONTROLE_DE_TERRITORIO_2022 - Copia.xlsx',
+const file = readFile('./sheet/CONTROLE_DE_TERRITORIO_2022.xlsx',
    {
       cellStyles: true,
-      cellHTML: true,
-      cellDates: true
+      cellHTML: true
    })
 
 export function getData() {
@@ -67,15 +66,17 @@ export function getData() {
 }
 
 
-export function addRow() {
+/* export function addRow() {
    const worksheet = file.Sheets  //utils.json_to_sheet(getData());
    const workbook = file
 
    //utils.book_append_sheet(workbook, worksheet, "Dates")
 
-   writeFile(workbook, "./sheet/forTesting.xlsx", {compression: true});
+   writeFile(workbook, "./sheet/forTesting.xlsx", {
+      compression: true
+   });
 
 
 
-}
+} */
 
