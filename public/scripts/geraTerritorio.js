@@ -3,7 +3,7 @@ import gts from 'excel-date-to-js'
 const { readFile, utils, writeFile } = xlsx;
 const { getJsDateFromExcel } = gts;
 
-const file = readFile('./sheet/copiateste.xlsx',
+const file = readFile('./sheet/CONTROLE_DE_TERRITORIO_2022.xlsx',
    {
       cellStyles: true,
       cellHTML: true
