@@ -3,11 +3,14 @@ import gts from 'excel-date-to-js'
 const { readFile, utils, writeFile } = xlsx;
 const { getJsDateFromExcel } = gts;
 
-const file = readFile('./sheet/CONTROLE_DE_TERRITORIO_2022.xlsx',
+/* const file = readFile('./sheet/CONTROLE_DE_TERRITORIO_2022.xlsx',
    {
       cellStyles: true,
       cellHTML: true
    })
+ */
+
+const file = readFile('./sheet/CONTROLE_DE_TERRITORIO_2022.xlsx')
 
 export function getData() {
    let data = []
@@ -43,6 +46,7 @@ export function getData() {
                };
             }
 
+         
             return {
                Territorio: currentTerritory.Territorio,
                Rodadas: e.Rodadas != undefined ? +e.Rodadas.replace("ª", "") : 0,
@@ -72,10 +76,10 @@ export function addRow() {
 
    //utils.book_append_sheet(workbook, worksheet, "Dates")
    console.log(file.Sheets["NOVA"]["!merges"])
-   
-   
-   
-  writeFile(workbook, "./sheet/forTesting.xlsx", {compression: true});
+
+
+
+   writeFile(workbook, "./sheet/forTesting.xlsx", { compression: true });
 
 
 
