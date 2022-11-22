@@ -39,9 +39,6 @@ app.get('/addRow', (req, res) => {
 })
 
 
-
-
-
 app.listen(port, () => {
     console.log(`server is running: ${port}`)
 })

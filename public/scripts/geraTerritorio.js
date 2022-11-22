@@ -14,7 +14,7 @@ const file = readFile('./sheet/CONTROLE_DE_TERRITORIO_2022.xlsx')
 
 export function getData() {
    let data = []
-   const inactiveTerritoryList = [10, 17, 41] //territorios que não estão em uso
+   const inactiveTerritoryList = [] //territorios que não estão em uso
 
    const sheets = file.SheetNames
 
