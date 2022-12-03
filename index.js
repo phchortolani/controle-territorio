@@ -31,7 +31,6 @@ app.get('/getTerritory/:id', (req, res) => {
 })
 
 
-
 app.listen(port, () => {
     console.log(`server is running: ${port}`)
 })
