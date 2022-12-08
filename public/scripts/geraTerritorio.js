@@ -1,5 +1,7 @@
 import xlsx from 'xlsx'
 import gts from 'excel-date-to-js'
+import moment from 'moment/moment.js';
+
 const { readFile, utils, writeFile } = xlsx;
 const { getJsDateFromExcel } = gts;
 
@@ -50,9 +52,9 @@ export function getData() {
             return {
                Territorio: currentTerritory.Territorio,
                Dirigente: e.Dirigente,
-               Saida_1: e['Primeira Saída'] ? getJsDateFromExcel(e['Primeira Saída']) : "",
-               Saida_2: e['Segunda Saída'] ? getJsDateFromExcel(e['Segunda Saída']) : "",
-               Devolucao: e['Devolução Prevista'] ? getJsDateFromExcel(e['Devolução Prevista']) : "",
+               Saida_1: e['Primeira Saída'] ? moment(getJsDateFromExcel(e['Primeira Saída'])).add(1, 'days').format('DD/MM/YYYY') : "",
+               Saida_2: e['Segunda Saída'] ? moment(getJsDateFromExcel(e['Segunda Saída'])).add(1, 'days').format('DD/MM/YYYY') : "",
+               Devolucao: e['Devolução Prevista'] ? moment(getJsDateFromExcel(e['Devolução Prevista'])).add(1, 'days').format('DD/MM/YYYY') : "",
                DiaSemana: e['Dia da Semana'],
                Rodadas: e.Rodadas != undefined ? +e.Rodadas.replace("ª", "") : 0,
                Grupo: e.Grupo,
