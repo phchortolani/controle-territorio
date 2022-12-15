@@ -138,4 +138,40 @@ export function addRow() {
 
 
 }
+function gerar(territorios, casas) {
 
+   let territoriosGerados = []
+   let totalCasas = 0;
+   let tAnt = 0;
+
+
+   function generate(removeTerritorio) {
+      var tempT = territorios.filter((e) => !removeTerritorio.includes(e.Territorio))
+
+      tempT.forEach((cur) => {
+
+         if (totalCasas < casas) {
+
+            if (cur.Proximos.includes(tAnt) || tAnt == 0) {
+               territoriosGerados.push(cur.Territorio)
+               tAnt = cur.Territorio;
+               if (cur.NumCasas) {
+                  totalCasas += cur.NumCasas
+               }
+            }
+
+         }
+      }
+      );
+
+   }
+
+   let i = 0;
+   while(i++ < territorios){
+      if (totalCasas < casas) break;
+      generate([territoriosGerados])
+   }
+   
+
+   return { territoriosAnalisados: territorios, territoriosGerados, totalCasas }
+}
