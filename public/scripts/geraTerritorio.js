@@ -4,13 +4,10 @@ import moment from 'moment/moment.js';
 
 const { readFile, utils, writeFile } = xlsx;
 const { getJsDateFromExcel } = gts;
+const leaders = ["MARCOS MARQUES", "JOAO LIMA", "ARNALDO", "GERONIMO", "NATANAEL", "BRUNO", "SEBASTIAO", "FERNANDO"]
+const fieldDays = ["TERCA", "QUARTA", "QUINTA", "SEXTA", "SABADO", "DOMINGO"]
 
-/* const file = readFile('./sheet/CONTROLE_DE_TERRITORIO_2022.xlsx',
-   {
-      cellStyles: true,
-      cellHTML: true
-   })
- */
+
 
 const file = readFile('./sheet/CONTROLE_DE_TERRITORIO_2022.xlsx')
 
@@ -167,11 +164,100 @@ function gerar(territorios, casas) {
    }
 
    let i = 0;
-   while(i++ < territorios){
+   while (i++ < territorios) {
       if (totalCasas < casas) break;
       generate([territoriosGerados])
    }
-   
+
 
    return { territoriosAnalisados: territorios, territoriosGerados, totalCasas }
+}
+
+
+export function getDevolucao() {
+   const currentDate = new Date(new Date().toISOString().split('T')[0].split("-")[0], new Date().toISOString().split('T')[0].split("-")[1], new Date().toISOString().split('T')[0].split("-")[2]);
+   let territorys = getData();
+   let ret = {}
+   territorys = Latest(territorys) // obtem somente as ultimas rodadas
+
+
+   fieldDays.forEach((day) => {
+   
+      
+      leaders.forEach((brother) => {
+
+         var territorysAfterFilters = new Filters(brother, "ABERTO", day, territorys).Equals();
+
+         territorysAfterFilters.forEach(element => {
+            const { Territorio, Dirigente, Devolucao, DiaSemana } = element
+
+            var dateDevolucao = new Date(Devolucao.split("/")[2], Devolucao.split("/")[1], Devolucao.split("/")[0])
+
+            if (dateDevolucao <= currentDate) {
+               console.log(day + " - " + Dirigente + " T:" + Territorio + " Devolucao: " + Devolucao)
+            }
+
+         });
+
+      })
+
+   })
+
+
+   /*  Arnaldo:{
+          Segunda:
+          Terca:
+       } 
+    */
+
+
+
+   return { ret }
+}
+
+
+function Latest(t) {
+
+   let rodadasList = []
+   t.forEach((e) => {
+      const index = rodadasList.findIndex((x) => x?.Territorio == e.Territorio);
+      if (index > -1) {
+         rodadasList.splice(index, 1);
+         rodadasList[index] = e;
+      } else {
+         rodadasList.push(e)
+      }
+   })
+
+   return rodadasList;
+
+}
+
+
+class Filters {
+
+   constructor(leaderName, status, day, listOfTerritory) {
+      this.leader = leaderName
+      this.status = status
+      this.day = day
+      this.list = listOfTerritory
+   }
+
+   obterultimo(territorio) {
+      return this.list.find((e) => e.Territorio == territorio).Rodadas
+   }
+
+
+   Equals() {
+      return this.list.filter((e) => {
+         return (e.Dirigente?.toUpperCase() == this.leader) && (this.obterultimo(e.Territorio) == e.Rodadas) && (e.Status?.toUpperCase() == this.status && e.DiaSemana == this.day)
+      })
+   }
+
+   NotEquals() {
+      return this.list.filter((e) => {
+         return (e.Dirigente?.toUpperCase() != this.leader) && (this.obterultimo(e.Territorio) == e.Rodadas) && (e.Status?.toUpperCase() != this.status && e.DiaSemana != this.day)
+      })
+   }
+
 }

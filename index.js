@@ -1,4 +1,4 @@
-import { getData } from "./public/scripts/geraTerritorio.js";
+import { getData , getDevolucao} from "./public/scripts/geraTerritorio.js";
 import Express from "express";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -29,6 +29,14 @@ app.get('/getTerritory/:id', (req, res) => {
     });
 
 })
+
+
+app.get('/devolucao', (req, res) => {
+
+    res.json(getDevolucao())
+
+})
+
 
 
 app.listen(port, () => {
