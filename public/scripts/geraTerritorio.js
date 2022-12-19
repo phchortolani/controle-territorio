@@ -182,19 +182,20 @@ export function getDevolucao() {
 
 
    fieldDays.forEach((day) => {
-   
-      
+      ret[day] = {}
+
       leaders.forEach((brother) => {
 
          var territorysAfterFilters = new Filters(brother, "ABERTO", day, territorys).Equals();
-
-         territorysAfterFilters.forEach(element => {
+         var tlist = []
+         territorysAfterFilters.forEach((element, i) => {
             const { Territorio, Dirigente, Devolucao, DiaSemana } = element
 
             var dateDevolucao = new Date(Devolucao.split("/")[2], Devolucao.split("/")[1], Devolucao.split("/")[0])
 
-            if (dateDevolucao <= currentDate) {
-               console.log(day + " - " + Dirigente + " T:" + Territorio + " Devolucao: " + Devolucao)
+            if (dateDevolucao <= currentDate) {  //filtro por data
+               tlist.push(Territorio);
+               ret[day] = { [brother]: { Devolucao, Territorios: tlist } }
             }
 
          });
@@ -203,16 +204,7 @@ export function getDevolucao() {
 
    })
 
-
-   /*  Arnaldo:{
-          Segunda:
-          Terca:
-       } 
-    */
-
-
-
-   return { ret }
+   return ret
 }
 
 
