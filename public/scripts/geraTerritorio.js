@@ -4,9 +4,9 @@ import moment from 'moment/moment.js';
 
 const { readFile, utils, writeFile } = xlsx;
 const { getJsDateFromExcel } = gts;
-const leaders = ["MARCOS MARQUES", "JOAO LIMA", "ARNALDO", "GERONIMO", "NATANAEL", "BRUNO", "SEBASTIAO", "FERNANDO"]
+const leaders = ["MARCOS MARQUES", "JOAO LIMA", "ARNALDO", "GERONIMO", "NATANAEL", "BRUNO", "SEBASTIAO", "FERNANDO", "ALEX"]
 const fieldDays = ["TERCA", "QUARTA", "QUINTA", "SEXTA", "SABADO", "DOMINGO"]
-
+const currentDate = () => getCurrentDate();
 
 
 const file = readFile('./sheet/CONTROLE_DE_TERRITORIO_2022.xlsx')
@@ -173,9 +173,10 @@ function gerar(territorios, casas) {
    return { territoriosAnalisados: territorios, territoriosGerados, totalCasas }
 }
 
-
+function getCurrentDate() {
+   return new Date(new Date().toISOString().split('T')[0].split("-")[0], new Date().toISOString().split('T')[0].split("-")[1], new Date().toISOString().split('T')[0].split("-")[2]);
+}
 export function getDevolucao() {
-   const currentDate = new Date(new Date().toISOString().split('T')[0].split("-")[0], new Date().toISOString().split('T')[0].split("-")[1], new Date().toISOString().split('T')[0].split("-")[2]);
    let territorys = getData();
    let ret = {}
    territorys = Latest(territorys) // obtem somente as ultimas rodadas
@@ -189,11 +190,11 @@ export function getDevolucao() {
          var territorysAfterFilters = new Filters(brother, "ABERTO", day, territorys).Equals();
          var tlist = []
          territorysAfterFilters.forEach((element, i) => {
-            const { Territorio, Dirigente, Devolucao, DiaSemana } = element
+            const { Territorio, Devolucao } = element
 
             var dateDevolucao = new Date(Devolucao.split("/")[2], Devolucao.split("/")[1], Devolucao.split("/")[0])
 
-            if (dateDevolucao <= currentDate) {  //filtro por data
+            if (dateDevolucao <= currentDate()) {  //filtro por data
                tlist.push(Territorio);
                ret[day] = { [brother]: { Devolucao, Territorios: tlist } }
             }
@@ -205,6 +206,53 @@ export function getDevolucao() {
    })
 
    return ret
+}
+
+
+function getAllByStatus(status, leader) {
+   const territorios = Latest(getData());
+
+   //let territorys = new Filters(leader, "ABERTO", null, territorios).GetAllLastByStatus();
+   let ret = {}
+
+   fieldDays.forEach((day) => {
+      ret[day] = {}
+
+      leaders.forEach((brother) => {
+         if (leader) brother = leader
+         var tlist = []
+         var territorysAfterFilters = new Filters(brother, "ABERTO", day, territorios).Equals();
+
+         territorysAfterFilters.forEach((element) => {
+            const { Territorio, Saida_1, Saida_2, Devolucao } = element
+
+            tlist.push(Territorio);
+            ret[day][brother] = { Saida_1, Saida_2, Devolucao, Territorios: tlist }
+         });
+
+      })
+
+   })
+
+
+   return ret
+}
+
+export function getOpen(leader) {
+
+   return getAllByStatus("ABERTO", leader)
+
+}
+export function getClose(leader) {
+   const territorios = Latest(getData());
+   let ret = new Filters(leader, "OK", null, territorios).GetAllLastByStatus().map(
+      (e) => {
+         var obj = { Territorio: e.Territorio, UltimoTrabalhadoEm: (e.Saida_2 || e.Saida_1), Dia: e.DiaSemana, Dirigente: e.Dirigente, Rodadas: e.Rodadas }
+         return obj
+      }
+   );
+   return ret
+
 }
 
 
@@ -252,4 +300,13 @@ class Filters {
       })
    }
 
+   GetAllLastByStatus() {
+
+      return this.list.filter((e) => {
+         if (this.leader) {
+            return (e.Dirigente?.toUpperCase() == this.leader) && (this.obterultimo(e.Territorio) == e.Rodadas) && (e.Status?.toUpperCase() == this.status)
+         }
+         return (this.obterultimo(e.Territorio) == e.Rodadas) && (e.Status?.toUpperCase() == this.status)
+      })
+   }
 }

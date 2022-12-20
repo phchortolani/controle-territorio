@@ -1,4 +1,4 @@
-import { getData , getDevolucao} from "./public/scripts/geraTerritorio.js";
+import { getData, getDevolucao, getOpen, getClose } from "./public/scripts/geraTerritorio.js";
 import Express from "express";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -32,9 +32,21 @@ app.get('/getTerritory/:id', (req, res) => {
 
 
 app.get('/devolucao', (req, res) => {
-
     res.json(getDevolucao())
+})
+app.get('/abertos', (req, res) => {
+    res.json(getOpen())
+})
+app.get('/fechados', (req, res) => {
+    res.json(getClose())
+})
 
+
+app.get('/abertos/:leader', (req, res) => {
+    res.json(getOpen(req.params.leader?.toUpperCase()))
+})
+app.get('/fechados/:leader', (req, res) => {
+    res.json(getClose(req.params.leader?.toUpperCase()))
 })
 
 
