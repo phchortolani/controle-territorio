@@ -1,4 +1,4 @@
-import { getData, getDevolucao, getOpen, getClose } from "./public/scripts/geraTerritorio.js";
+import { getData, getDevolucao, getOpen, getClose, Generate } from "./public/scripts/geraTerritorio.js";
 import Express from "express";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -41,6 +41,10 @@ app.get('/fechados', (req, res) => {
     res.json(getClose())
 })
 
+
+app.get('/gerar', (req, res) => {
+    res.json(Generate())
+})
 
 app.get('/abertos/:leader', (req, res) => {
     res.json(getOpen(req.params.leader?.toUpperCase()))

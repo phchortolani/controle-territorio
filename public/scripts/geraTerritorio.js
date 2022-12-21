@@ -132,45 +132,135 @@ export function addRow() {
 
    writeFile(workbook, "./sheet/forTesting.xlsx", { compression: true });
 
-
-
 }
-function gerar(territorios, casas) {
-
-   let territoriosGerados = []
-   let totalCasas = 0;
-   let tAnt = 0;
 
 
-   function generate(removeTerritorio) {
-      var tempT = territorios.filter((e) => !removeTerritorio.includes(e.Territorio))
+export function Generate() {
+   return gerar(Latest(getData()), 110)
+}
+function gerar(territorios, casas, DirigenteSabado) {
 
-      tempT.forEach((cur) => {
+   let ret = {}
 
-         if (totalCasas < casas) {
+   //OBTER APENAS TERRITORIOS OK
+   let analisados = new Filters(null, "OK", null, territorios).GetAllLastByStatus();
 
-            if (cur.Proximos.includes(tAnt) || tAnt == 0) {
-               territoriosGerados.push(cur.Territorio)
-               tAnt = cur.Territorio;
-               if (cur.NumCasas) {
-                  totalCasas += cur.NumCasas
-               }
-            }
+   //ORDERNAR TERRITORIOS POR DATA MAIS ANTIGA PARA A MAIS NOVA
 
+   analisados = analisados.sort((a, b) => {
+      var aDate = a.Saida_2 || a.Saida_1
+      var bDate = b.Saida_2 || b.Saida_1
+      var ADC = new Date(aDate.split('/').reverse())
+      var BDC = new Date(bDate.split('/').reverse())
+
+      return ADC.getTime() - BDC.getTime()
+   })
+
+
+   //GERAR APENAS DIAS EM QUE NÃO HÁ TERRITÓRIOS ABERTOS
+
+   let DaysForGeneration = []
+   var temp = getOpen()
+   for (let i in temp) {
+
+      for (let l of leaders) {
+         if (temp[i].hasOwnProperty(l)) {
+            DaysForGeneration.push(i);
          }
       }
-      );
 
    }
 
-   let i = 0;
-   while (i++ < territorios) {
-      if (totalCasas < casas) break;
-      generate([territoriosGerados])
+   DaysForGeneration = fieldDays.filter((e) => !DaysForGeneration.includes(e))
+
+   //GERAR APENAS TERRITORIOS EM DIAS DIFERENTES AO ULTIMO TRABALHADO
+   let ListaGerada = {};
+
+   DaysForGeneration.forEach(day => {
+      ListaGerada[day] = analisados.filter((e) => e.DiaSemana != day).map((e) => {
+         return {
+            Territorio: e.Territorio,
+            Dirigente: e.Dirigente,
+            Dia: e.DiaSemana,
+            Proximos: e.Proximos,
+            NumCasas: e.NumCasas
+         }
+      }
+      )
+   });
+
+   //GERAR APENAS PARA IRMAO DIFERENTE DO ULTIMO TRABALHADO
+   var tempGenerate = {}
+   DaysForGeneration.forEach(day => {
+      var tempLeaders = []
+      var tempListaGerada = []
+
+      if (day != "DOMINGO") {
+
+         if (day == "TERCA") tempLeaders = ["FERNANDO", "SEBASTIAO"]
+         if (day == "QUARTA" || day == "SEXTA") tempLeaders = ["ARNALDO"]
+         if (day == "QUINTA") tempLeaders = ["GERONIMO", "NATANAEL"]
+         if (day == "SABADO") {
+            if (DirigenteSabado) tempLeaders = [DirigenteSabado]
+         }
+
+         tempListaGerada = ListaGerada[day].filter(e => !tempLeaders.includes(e.Dirigente))
+         tempGenerate[day] = tempListaGerada
+      } else {
+         const domLeaders = ["VOLNEI", "MARCOS MARQUES", "ARNALDO", "BRUNO", "JOAO LIMA"]
+
+         domLeaders.forEach(curLeader => {
+            tempListaGerada = ListaGerada[day].filter(e => e.Dirigente != curLeader)
+            tempGenerate[day][curLeader] = tempListaGerada
+         });
+
+      }
+
+   })
+
+   //VERIFICAR CADA TERRITÓRIO GERADO E SE OS TERRITÓRIOS PERTOS ESTÃO DISPONIVEIS NA LISTA GERADA, 
+   let sugestoes = {}
+
+   for (let day in tempGenerate) {
+      let tlist = []
+      tempGenerate[day].forEach(t => {
+
+         let nearsInList = tempGenerate[day].filter((x) => t.Proximos.includes(x.Territorio))
+         let totalCasas = nearsInList.reduce((acc, cur) => (acc + cur.NumCasas || 0), 0)
+         tlist.push({ Territorio: t.Territorio, TotalCasas: totalCasas, TerritoriosProximos: nearsInList.map((m) => m.Territorio) })
+
+      });
+
+      sugestoes[day] = tlist
    }
+   //SE OS TERRITORIOS GERADOS ESTIVEREM PRÓXIMOS UTILIZAR ELES SOMENTE SE O TOTAL DE CASAS FOR PRÓXIMO DE 120
+   //SE FOR MENOR QUE 120 VERIFICAR PRÓXIMO TERRITÓRIO DA LISTA DE GERADA
+
+   let gerados = {}
+   let _sugestoes = []
+   DaysForGeneration.forEach((day) => {
+
+      sugestoes[day].forEach((e) => {
+         const element = e
+         let TempGen = (element.TerritoriosProximos.concat(element.Territorio))
+
+         if (element.TotalCasas >= casas && !gerados[day] && !TempGen.find(x => _sugestoes.includes(x))) {
+            gerados[day] = { TerritoriosGerados: TempGen, TotalCasas: element.TotalCasas }
+            _sugestoes = _sugestoes.concat(gerados[day].TerritoriosGerados)
+         }
+
+      });
+
+   })
 
 
-   return { territoriosAnalisados: territorios, territoriosGerados, totalCasas }
+   //SE TODOS OS TERRITORIOS COM SEUS PRÓXIMOS FOREM MENOR QUE O 12O, UTILIZAR A LISTA GERADA.
+
+
+   ret.GeradosPara = DaysForGeneration
+   ret.analisados = analisados.map((e) => { return e.Territorio  })
+   ret.gerados = gerados
+   return ret;
 }
 
 function getCurrentDate() {
