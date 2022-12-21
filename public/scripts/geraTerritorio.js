@@ -8,6 +8,9 @@ const { getJsDateFromExcel } = gts;
 const leaders = ["MARCOS MARQUES", "JOAO LIMA", "ARNALDO", "GERONIMO", "NATANAEL", "BRUNO", "SEBASTIAO", "FERNANDO", "ALEX", "VOLNEI"]
 const fieldDays = ["TERCA", "QUARTA", "QUINTA", "SEXTA", "SABADO", "DOMINGO"]
 const domLeaders = ["VOLNEI", "MARCOS MARQUES", "ARNALDO", "BRUNO", "JOAO LIMA"]
+const terLeaders = ["FERNANDO", "SEBASTIAO"]
+const sexLeaders = ["ARNALDO"]
+const quiLeaders = ["GERONIMO", "NATANAEL"]
 
 const currentDate = () => getCurrentDate();
 
@@ -220,12 +223,11 @@ function gerar(territorios, casas, DirigenteSabado) {
 
       if (day != "DOMINGO") {
 
-         if (day == "TERCA") tempLeaders = ["FERNANDO", "SEBASTIAO"]
-         if (day == "QUARTA" || day == "SEXTA") tempLeaders = ["ARNALDO"]
-         if (day == "QUINTA") tempLeaders = ["GERONIMO", "NATANAEL"]
-         if (day == "SABADO") {
-            if (DirigenteSabado) tempLeaders = [DirigenteSabado]
-         }
+         if (day == "TERCA") tempLeaders = terLeaders
+         if (day == "QUARTA" || day == "SEXTA") tempLeaders = sexLeaders
+         if (day == "QUINTA") tempLeaders = quiLeaders
+         if (day == "SABADO") if (DirigenteSabado) tempLeaders = [DirigenteSabado]
+
 
          tempListaGerada = ListaGerada[day].filter(e => !tempLeaders.includes(e.Dirigente))
          tempGenerate[day] = tempListaGerada
