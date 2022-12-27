@@ -7,15 +7,18 @@ const { getJsDateFromExcel } = gts;
 
 const leaders = ["MARCOS MARQUES", "JOAO LIMA", "ARNALDO", "GERONIMO", "NATANAEL", "BRUNO", "SEBASTIAO", "FERNANDO", "ALEX", "VOLNEI"]
 const fieldDays = ["TERCA", "QUARTA", "QUINTA", "SEXTA", "SABADO", "DOMINGO"]
-const domLeaders = ["VOLNEI", "MARCOS MARQUES", "ARNALDO", "BRUNO", "JOAO LIMA"]
+const domLeaders = ["ARNALDO", "VOLNEI", "MARCOS MARQUES", "BRUNO", "JOAO LIMA"]
 const terLeaders = ["FERNANDO", "SEBASTIAO"]
 const sexLeaders = ["ARNALDO"]
 const quiLeaders = ["GERONIMO", "NATANAEL"]
 
 const currentDate = () => getCurrentDate();
 
-
-const file = readFile('./sheet/CONTROLE_DE_TERRITORIO_2022.xlsx')
+const UsarMenosTerritorios = false
+const devTest = false;
+const numMinCasas = 110
+/* const file = readFile('./sheet/CONTROLE_DE_TERRITORIO_2022.xlsx') */
+const file = readFile(devTest ? './sheet/teste.xlsx' : './sheet/CONTROLE_DE_TERRITORIO_2022.xlsx')
 
 export function getData() {
    let data = []
@@ -142,7 +145,7 @@ export function addRow() {
 
 
 export function Generate() {
-   return gerar(Latest(getData()), 110)
+   return gerar(Latest(getData()), numMinCasas)
 }
 function gerar(territorios, casas, DirigenteSabado) {
 
@@ -194,7 +197,8 @@ function gerar(territorios, casas, DirigenteSabado) {
 
    DaysForGeneration = fieldDays.filter((e) => !DaysForGeneration.includes(e))
 
-   if (leaderOfDomingo.length > 0) {
+
+   if (leaderOfDomingo.length > 0 && !DaysForGeneration.includes("DOMINGO")) {
       DaysForGeneration.push("DOMINGO")
    }
 
@@ -233,16 +237,14 @@ function gerar(territorios, casas, DirigenteSabado) {
          tempGenerate[day] = tempListaGerada
       } else {
          tempGenerate[day] = {}
+
          leaderOfDomingo.forEach(curLeader => {
             tempListaGerada = ListaGerada[day].filter(e => e.Dirigente != curLeader)
             tempGenerate[day][curLeader] = tempListaGerada
          });
-
       }
 
    })
-
-
 
    //VERIFICAR CADA TERRITÓRIO GERADO E SE OS TERRITÓRIOS PERTOS ESTÃO DISPONIVEIS NA LISTA GERADA, 
    let sugestoes = {}
@@ -263,20 +265,56 @@ function gerar(territorios, casas, DirigenteSabado) {
             }
 
             ArrayLeaderTerritorios.forEach(t => {
+               let qtTerritorio = 1
                let nearsInList = ArrayLeaderTerritorios.filter((x) => t.Proximos.includes(x.Territorio))
-               let totalCasas = nearsInList.reduce((acc, cur) => (acc + cur.NumCasas || 0), 0)
-               tlist.push({ Territorio: t.Territorio, TotalCasas: totalCasas, TerritoriosProximos: nearsInList.map((m) => m.Territorio) })
+               let TerritoriosProximosSuficientes = []
+               let totalCasas = nearsInList.reduce((acc, cur) => {
+                  if (acc <= casas) {
+                     qtTerritorio++
+                     TerritoriosProximosSuficientes.push(cur.Territorio)
+                     return (acc + cur.NumCasas || 0)
+                  }
+                  return acc
+               }, t.NumCasas || 0)
+
+               if (totalCasas >= casas) {
+
+                  tlist.push({
+                     Territorio: t.Territorio,
+                     TotalCasas: totalCasas,
+                     TerritoriosProximosSuficiente: TerritoriosProximosSuficientes,
+                     qtTerritorios: qtTerritorio
+                  })
+
+               }
 
             });
 
             sugestoes[day][nameofLeader] = tlist
          }
       } else {
-         tempGenerate[day].forEach(t => {
 
+         tempGenerate[day].forEach(t => {
+            let qtTerritorio = 1
             let nearsInList = tempGenerate[day].filter((x) => t.Proximos.includes(x.Territorio))
-            let totalCasas = nearsInList.reduce((acc, cur) => (acc + cur.NumCasas || 0), 0)
-            tlist.push({ Territorio: t.Territorio, TotalCasas: totalCasas, TerritoriosProximos: nearsInList.map((m) => m.Territorio) })
+            let TerritoriosProximosSuficientes = []
+            let totalCasas = nearsInList.reduce((acc, cur) => {
+               if (acc <= casas) {
+                  qtTerritorio++
+                  TerritoriosProximosSuficientes.push(cur.Territorio)
+                  return (acc + cur.NumCasas || 0)
+               }
+               return acc
+            }, t.NumCasas || 0)
+
+            if (totalCasas >= casas) {
+               tlist.push({
+                  Territorio: t.Territorio,
+                  TotalCasas: totalCasas,
+                  TerritoriosProximosSuficiente: TerritoriosProximosSuficientes,
+                  qtTerritorios: qtTerritorio
+               })
+            }
 
          });
 
@@ -284,6 +322,11 @@ function gerar(territorios, casas, DirigenteSabado) {
       }
 
    }
+
+   // OTIMIZAR SUGESTOES PARA UTILIZAR MENOS TERRITORIOS 
+
+   if (UsarMenosTerritorios) Otimizar(sugestoes)
+
    //SE OS TERRITORIOS GERADOS ESTIVEREM PRÓXIMOS UTILIZAR ELES SOMENTE SE O TOTAL DE CASAS FOR PRÓXIMO DE 120
    //SE FOR MENOR QUE 120 VERIFICAR PRÓXIMO TERRITÓRIO DA LISTA DE GERADA
 
@@ -292,25 +335,27 @@ function gerar(territorios, casas, DirigenteSabado) {
    DaysForGeneration.forEach((day) => {
 
       if (day == "DOMINGO") {
+         gerados[day] = {}
          for (let leader in leaderOfDomingo) {
             sugestoes[day][leaderOfDomingo[leader]].forEach((e) => {
                const element = e
-               let TempGen = (element.TerritoriosProximos.concat(element.Territorio))
 
-               if (element.TotalCasas >= casas && !gerados[day] && !TempGen.find(x => _sugestoes.includes(x))) {
-                  gerados[day] = { [leaderOfDomingo[leader]]: TempGen, TotalCasas: element.TotalCasas }
-                  _sugestoes = _sugestoes.concat(gerados[day].TerritoriosGerados)
+               let TempGen = (element.TerritoriosProximosSuficiente.concat(element.Territorio))
+
+               if (element.TotalCasas >= casas && !gerados[day][leaderOfDomingo[leader]] && !TempGen.find(x => _sugestoes.includes(x))) {
+                  gerados[day][leaderOfDomingo[leader]] = { Territorios: TempGen, TotalCasas: element.TotalCasas }
+                  _sugestoes = _sugestoes.concat(TempGen)
                }
             });
          }
       } else {
          sugestoes[day].forEach((e) => {
             const element = e
-            let TempGen = (element.TerritoriosProximos.concat(element.Territorio))
+            let TempGen = (element.TerritoriosProximosSuficiente.concat(element.Territorio))
 
             if (element.TotalCasas >= casas && !gerados[day] && !TempGen.find(x => _sugestoes.includes(x))) {
                gerados[day] = { TerritoriosGerados: TempGen, TotalCasas: element.TotalCasas }
-               _sugestoes = _sugestoes.concat(gerados[day].TerritoriosGerados)
+               _sugestoes = _sugestoes.concat(TempGen)
             }
 
          });
@@ -324,6 +369,57 @@ function gerar(territorios, casas, DirigenteSabado) {
 
    return ret;
 }
+
+function Otimizar(sugestoes) {
+
+   let ret = {}
+   for (let day in sugestoes) {
+
+      let sortable;
+
+      if (day != "DOMINGO") {
+
+         sortable = sugestoes[day].sort((a, b) => {
+
+            if (a.qtTerritorios < b.qtTerritorios) {
+               return -1;
+            }
+            if (a.qtTerritorios > b.qtTerritorios) {
+               return 1;
+            }
+            // a deve ser igual a b
+            return 0;
+
+         })
+         ret[day] = sortable
+      } else {
+
+         for (let leader in sugestoes[day]) {
+
+            ret[day] = {}
+            sortable = sugestoes[day][leader].sort((a, b) => {
+
+               if (a.qtTerritorios < b.qtTerritorios) {
+                  return -1;
+               }
+               if (a.qtTerritorios > b.qtTerritorios) {
+                  return 1;
+               }
+               // a deve ser igual a b
+               return 0;
+            })
+            ret[day][leader] = sortable
+         }
+
+
+      }
+
+   }
+
+   return new Object(ret);
+}
+
+
 
 function getCurrentDate() {
    return new Date(new Date().toISOString().split('T')[0].split("-")[0], new Date().toISOString().split('T')[0].split("-")[1], new Date().toISOString().split('T')[0].split("-")[2]);
