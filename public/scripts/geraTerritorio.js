@@ -7,16 +7,16 @@ const { getJsDateFromExcel } = gts;
 
 const leaders = ["MARCOS MARQUES", "JOAO LIMA", "ARNALDO", "GERONIMO", "NATANAEL", "BRUNO", "SEBASTIAO", "FERNANDO", "ALEX", "VOLNEI"]
 const fieldDays = ["TERCA", "QUARTA", "QUINTA", "SEXTA", "SABADO", "DOMINGO"]
-const domLeaders = ["ARNALDO", "VOLNEI", "MARCOS MARQUES", "BRUNO", "JOAO LIMA"]
+const domLeaders = ["JOAO LIMA", "BRUNO", "VOLNEI", "ARNALDO", "MARCOS MARQUES"]
 const terLeaders = ["FERNANDO", "SEBASTIAO"]
 const sexLeaders = ["ARNALDO"]
 const quiLeaders = ["GERONIMO", "NATANAEL"]
 
 const currentDate = () => getCurrentDate();
 
-const UsarMenosTerritorios = false
+const UsarMenosTerritorios = false // caso seja false utilizara os mais antigos
 const devTest = false;
-const numMinCasas = 110
+const numMinCasas = 100
 /* const file = readFile('./sheet/CONTROLE_DE_TERRITORIO_2022.xlsx') */
 const file = readFile(devTest ? './sheet/teste.xlsx' : './sheet/CONTROLE_DE_TERRITORIO_2022.xlsx')
 
@@ -130,7 +130,7 @@ function getNear(numTerritorio) {
 
 }
 
-export function addRow() {
+/* export function addRow() {
    const worksheet = file.Sheets  //utils.json_to_sheet(getData());
    const workbook = file
 
@@ -141,7 +141,7 @@ export function addRow() {
 
    writeFile(workbook, "./sheet/forTesting.xlsx", { compression: true });
 
-}
+} */
 
 
 export function Generate() {
@@ -197,11 +197,11 @@ function gerar(territorios, casas, DirigenteSabado) {
 
    DaysForGeneration = fieldDays.filter((e) => !DaysForGeneration.includes(e))
 
-
+   
    if (leaderOfDomingo.length > 0 && !DaysForGeneration.includes("DOMINGO")) {
       DaysForGeneration.push("DOMINGO")
    }
-
+    /*   DaysForGeneration.push("SABADO") */
    //GERAR APENAS TERRITORIOS EM DIAS DIFERENTES AO ULTIMO TRABALHADO
    let ListaGerada = {};
 
@@ -366,7 +366,7 @@ function gerar(territorios, casas, DirigenteSabado) {
    ret.gerados = gerados
    ret.GeradosPara = DaysForGeneration
    ret.analisados = analisados.map((e) => { return e.Territorio })
-
+   ret.sobrou = analisados.filter(x => !_sugestoes.includes(x.Territorio)).map((e) => { return { T: e.Territorio, D: e.Dirigente, Day: e.DiaSemana } })
    return ret;
 }
 
@@ -444,7 +444,7 @@ export function getDevolucao() {
 
             if (dateDevolucao <= currentDate()) {  //filtro por data
                tlist.push(Territorio);
-               ret[day] = { [brother]: { Devolucao, Territorios: tlist } }
+               ret[day][brother] = { Devolucao, Territorios: tlist }
             }
 
          });
