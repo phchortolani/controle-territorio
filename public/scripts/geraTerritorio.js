@@ -7,14 +7,14 @@ const { getJsDateFromExcel } = gts;
 
 const leaders = ["MARCOS MARQUES", "JOAO LIMA", "ARNALDO", "GERONIMO", "NATANAEL", "BRUNO", "SEBASTIAO", "FERNANDO", "ALEX", "VOLNEI"]
 const fieldDays = ["TERCA", "QUARTA", "QUINTA", "SEXTA", "SABADO", "DOMINGO"]
-const domLeaders = ["JOAO LIMA", "BRUNO", "VOLNEI", "ARNALDO", "MARCOS MARQUES"]
+const domLeaders = ["JOAO LIMA", "BRUNO", "ARNALDO", "VOLNEI"]
 const terLeaders = ["FERNANDO", "SEBASTIAO"]
 const sexLeaders = ["ARNALDO"]
 const quiLeaders = ["GERONIMO", "NATANAEL"]
 
 const currentDate = () => getCurrentDate();
 
-const UsarMenosTerritorios = false // caso seja false utilizara os mais antigos
+const UsarMenosTerritorios = true // caso seja false utilizara os mais antigos
 const devTest = false;
 const numMinCasas = 100
 /* const file = readFile('./sheet/CONTROLE_DE_TERRITORIO_2022.xlsx') */
