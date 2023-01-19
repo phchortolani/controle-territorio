@@ -11,13 +11,13 @@ const domLeaders = ["JOAO LIMA", "BRUNO", "ARNALDO", "VOLNEI"]
 const terLeaders = ["FERNANDO", "SEBASTIAO"]
 const sexLeaders = ["ARNALDO"]
 const quiLeaders = ["GERONIMO", "NATANAEL"]
-const sabLeader = "JOAO LIMA"
+const sabLeader = "VOLNEI"
 
 const currentDate = () => getCurrentDate();
 
 const UsarMenosTerritorios = false // caso seja false utilizara os mais antigos
 const devTest = false;
-const numMinCasas = 120
+const numMinCasas = 90
 /* const file = readFile('./sheet/CONTROLE_DE_TERRITORIO_2022.xlsx') */
 const file = readFile(devTest ? './sheet/teste.xlsx' : './sheet/CONTROLE_DE_TERRITORIO_2022.xlsx')
 
@@ -202,8 +202,6 @@ function gerar(territorios, casas, DirigenteSabado) {
    if (leaderOfDomingo.length > 0 && !DaysForGeneration.includes("DOMINGO")) {
       DaysForGeneration.push("DOMINGO")
    }
-
-    /*   DaysForGeneration.push("SABADO") */
    //GERAR APENAS TERRITORIOS EM DIAS DIFERENTES AO ULTIMO TRABALHADO
    let ListaGerada = {};
 
