@@ -15,7 +15,7 @@ const sabLeader = "VOLNEI"
 
 const currentDate = () => getCurrentDate();
 
-const UsarMenosTerritorios = true // caso seja false utilizara os mais antigos
+const UsarMenosTerritorios = false // caso seja false utilizara os mais antigos
 const devTest = false;
 const numMinCasas = 110
 /* const file = readFile('./sheet/CONTROLE_DE_TERRITORIO_2022.xlsx') */
