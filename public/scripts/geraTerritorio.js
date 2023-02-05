@@ -11,14 +11,13 @@ const domLeaders = ["JOAO LIMA", "BRUNO", "ARNALDO", "VOLNEI"]
 const terLeaders = ["FERNANDO", "SEBASTIAO"]
 const sexLeaders = ["ARNALDO"]
 const quiLeaders = ["GERONIMO", "NATANAEL"]
-const sabLeader = "VOLNEI"
+const sabLeader = "JOAO LIMA"
 
 const currentDate = () => getCurrentDate();
 
 const UsarMenosTerritorios = false // caso seja false utilizara os mais antigos
 const devTest = false;
-const numMinCasas = 120
-/* const file = readFile('./sheet/CONTROLE_DE_TERRITORIO_2022.xlsx') */
+const numMinCasas = 130
 const file = readFile(devTest ? './sheet/teste.xlsx' : './sheet/CONTROLE_DE_TERRITORIO_2022.xlsx')
 
 export function getData() {
@@ -131,22 +130,9 @@ function getNear(numTerritorio) {
 
 }
 
-/* export function addRow() {
-   const worksheet = file.Sheets  //utils.json_to_sheet(getData());
-   const workbook = file
-
-   //utils.book_append_sheet(workbook, worksheet, "Dates")
-   console.log(file.Sheets["NOVA"]["!merges"])
-
-
-
-   writeFile(workbook, "./sheet/forTesting.xlsx", { compression: true });
-
-} */
-
 
 export function Generate() {
-   return gerar(Latest(getData()), numMinCasas,sabLeader)
+   return gerar(Latest(getData()), numMinCasas, sabLeader)
 }
 function gerar(territorios, casas, DirigenteSabado) {
 
@@ -198,11 +184,13 @@ function gerar(territorios, casas, DirigenteSabado) {
 
    DaysForGeneration = fieldDays.filter((e) => !DaysForGeneration.includes(e))
 
-   
+
    if (leaderOfDomingo.length > 0 && !DaysForGeneration.includes("DOMINGO")) {
       DaysForGeneration.push("DOMINGO")
    }
    //GERAR APENAS TERRITORIOS EM DIAS DIFERENTES AO ULTIMO TRABALHADO
+
+ 
    let ListaGerada = {};
 
    DaysForGeneration.forEach(day => {
@@ -343,7 +331,7 @@ function gerar(territorios, casas, DirigenteSabado) {
                let TempGen = (element.TerritoriosProximosSuficiente.concat(element.Territorio))
 
                if (element.TotalCasas >= casas && !gerados[day][leaderOfDomingo[leader]] && !TempGen.find(x => _sugestoes.includes(x))) {
-                  gerados[day][leaderOfDomingo[leader]] = { Territorios: TempGen, TotalCasas: element.TotalCasas }
+                  gerados[day][leaderOfDomingo[leader]] = { Territorios: TempGen.sort((a, b) => a - b), TotalCasas: element.TotalCasas }
                   _sugestoes = _sugestoes.concat(TempGen)
                }
             });
@@ -354,7 +342,7 @@ function gerar(territorios, casas, DirigenteSabado) {
             let TempGen = (element.TerritoriosProximosSuficiente.concat(element.Territorio))
 
             if (element.TotalCasas >= casas && !gerados[day] && !TempGen.find(x => _sugestoes.includes(x))) {
-               gerados[day] = { TerritoriosGerados: TempGen, TotalCasas: element.TotalCasas }
+               gerados[day] = { TerritoriosGerados: TempGen.sort((a, b) => a - b), TotalCasas: element.TotalCasas }
                _sugestoes = _sugestoes.concat(TempGen)
             }
 
@@ -365,8 +353,8 @@ function gerar(territorios, casas, DirigenteSabado) {
 
    ret.gerados = gerados
    ret.GeradosPara = DaysForGeneration
-   ret.analisados = analisados.map((e) => { return e.Territorio })
-   ret.sobrou = analisados.filter(x => !_sugestoes.includes(x.Territorio)).map((e) => { return { T: e.Territorio, D: e.Dirigente, Day: e.DiaSemana } })
+   ret.analisados = analisados.map((e) => { return e.Territorio }).sort((a, b) => a - b)
+   ret.sobrou = analisados.filter(x => !_sugestoes.includes(x.Territorio)).map((e) => { return { T: e.Territorio, D: e.Dirigente, Day: e.DiaSemana } }).sort((a, b) => a["T"] - b["T"])
    return ret;
 }
 
