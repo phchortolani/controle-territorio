@@ -5,13 +5,13 @@ import moment from 'moment/moment.js';
 const { readFile, utils, writeFile } = xlsx;
 const { getJsDateFromExcel } = gts;
 
-const leaders = ["MARCOS MARQUES", "JOAO LIMA", "ARNALDO", "GERONIMO", "NATANAEL", "BRUNO", "SEBASTIAO", "FERNANDO", "ALEX", "VOLNEI"]
+const leaders = ["MARCOS MARQUES", "JOAO LIMA", "ARNALDO", "GERONIMO", "NATANAEL", "BRUNO", "SEBASTIAO", "FERNANDO", "ALEX", "VOLNEI","ROGERIO"]
 const fieldDays = ["TERCA", "QUARTA", "QUINTA", "SEXTA", "SABADO", "DOMINGO"]
 const domLeaders = ["JOAO LIMA", "BRUNO", "ARNALDO", "VOLNEI"]
 const terLeaders = ["FERNANDO", "SEBASTIAO"]
 const sexLeaders = ["ARNALDO"]
 const quiLeaders = ["GERONIMO", "NATANAEL"]
-const sabLeader = "JOAO LIMA"
+const sabLeader = "ROGERIO"
 
 const currentDate = () => getCurrentDate();
 
