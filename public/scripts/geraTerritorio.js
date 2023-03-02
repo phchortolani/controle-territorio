@@ -5,13 +5,13 @@ import moment from 'moment/moment.js';
 const { readFile, utils, writeFile } = xlsx;
 const { getJsDateFromExcel } = gts;
 
-const leaders = ["MARCOS MARQUES", "JOAO LIMA", "ARNALDO", "GERONIMO", "NATANAEL", "BRUNO", "SEBASTIAO", "FERNANDO", "ALEX", "VOLNEI","ROGERIO"]
+const leaders = ["MARCOS MARQUES", "JOAO LIMA", "ARNALDO", "GERONIMO", "NATANAEL", "BRUNO", "SEBASTIAO", "FERNANDO", "ALEX", "VOLNEI", "ROGERIO"]
 const fieldDays = ["TERCA", "QUARTA", "QUINTA", "SEXTA", "SABADO", "DOMINGO"]
 const domLeaders = ["JOAO LIMA", "BRUNO", "ARNALDO", "VOLNEI"]
 const terLeaders = ["FERNANDO", "SEBASTIAO"]
 const sexLeaders = ["ARNALDO"]
 const quiLeaders = ["GERONIMO", "NATANAEL"]
-const sabLeader = "ALEX"
+const sabLeader = ""
 
 const currentDate = () => getCurrentDate();
 
@@ -430,7 +430,7 @@ export function getDevolucao() {
 
             if (dateDevolucao <= currentDate()) {  //filtro por data
                tlist.push(Territorio);
-               ret[day][brother] = { Devolucao, Territorios: tlist }
+               ret[day][brother] = { Devolucao, Territorios: tlist, mstT: day + " - " + tlist.join(','),  msg: "Olá," + brother + "!, tudo bem? apenas lembrando o irmão de levar os territórios hoje na reunião, Caso esteja com outro irmão, favor mandar esse lembrete para ele." }
             }
 
          });
