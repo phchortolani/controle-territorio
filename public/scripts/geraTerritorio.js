@@ -17,7 +17,7 @@ const currentDate = () => getCurrentDate();
 
 const UsarMenosTerritorios = false // caso seja false utilizara os mais antigos
 const devTest = false;
-const numMinCasas = 120
+const numMinCasas = 100
 const file = readFile(devTest ? './sheet/teste.xlsx' : './sheet/CONTROLE_DE_TERRITORIO_2022.xlsx')
 
 export function getData() {
@@ -140,6 +140,7 @@ function gerar(territorios, casas, DirigenteSabado) {
 
    //OBTER APENAS TERRITORIOS OK
    let analisados = new Filters(null, "OK", null, territorios).GetAllLastByStatus();
+   let convites = new Filters(null, "CONVITES", null, territorios).GetAllLastByStatus();
 
    //ORDERNAR TERRITORIOS POR DATA MAIS ANTIGA PARA A MAIS NOVA
 
@@ -430,7 +431,7 @@ export function getDevolucao() {
 
             if (dateDevolucao <= currentDate()) {  //filtro por data
                tlist.push(Territorio);
-               ret[day][brother] = { Devolucao, Territorios: tlist, mstT: day + " - " + tlist.join(','),  msg: "Olá," + brother + "!, tudo bem? apenas lembrando o irmão de levar os territórios hoje na reunião, Caso esteja com outro irmão, favor mandar esse lembrete para ele." }
+               ret[day][brother] = { Devolucao, Territorios: tlist, mstT: day + " - " + tlist.join(','), msg: "Olá," + brother + "!, tudo bem? apenas lembrando o irmão de levar os territórios hoje na reunião, Caso esteja com outro irmão, favor mandar esse lembrete para ele." }
             }
 
          });
