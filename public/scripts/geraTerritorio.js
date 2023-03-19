@@ -22,7 +22,7 @@ const file = readFile(devTest ? './sheet/teste.xlsx' : './sheet/CONTROLE_DE_TERR
 
 export function getData() {
    let data = []
-   const inactiveTerritoryList = [17] //territorios que não estão em uso
+   const inactiveTerritoryList = [] //territorios que não estão em uso
 
    const sheets = file.SheetNames
 
