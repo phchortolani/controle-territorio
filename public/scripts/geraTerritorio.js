@@ -2,7 +2,7 @@ import xlsx from 'xlsx'
 import gts from 'excel-date-to-js'
 import moment from 'moment/moment.js';
 
-const { readFile, utils, writeFile } = xlsx;
+const { readFile, utils } = xlsx;
 const { getJsDateFromExcel } = gts;
 
 const leaders = ["MARCOS MARQUES", "JOAO LIMA", "ARNALDO", "GERONIMO", "NATANAEL", "BRUNO", "SEBASTIAO", "FERNANDO", "ALEX", "VOLNEI", "ROGERIO"]
@@ -15,9 +15,9 @@ const sabLeader = ""
 
 const currentDate = () => getCurrentDate();
 
-const UsarMenosTerritorios = false // caso seja false utilizara os mais antigos
+const UsarMenosTerritorios = true // caso seja false utilizara os mais antigos
 const devTest = false;
-const numMinCasas = 130
+const numMinCasas = 110
 const file = readFile(devTest ? './sheet/teste.xlsx' : './sheet/CONTROLE_DE_TERRITORIO_2022.xlsx')
 
 export function getData() {
@@ -39,7 +39,7 @@ export function getData() {
    function MapData(data) {
       if (data?.length > 0) {
          let currentTerritory = {};
-         return data.map((e, i) => {
+         return data.map((e) => {
             if (e['Território']) {
                currentTerritory.Territorio = e['Território'];
                currentTerritory.Status = e.Status;
@@ -140,7 +140,6 @@ function gerar(territorios, casas, DirigenteSabado) {
 
    //OBTER APENAS TERRITORIOS OK
    let analisados = new Filters(null, "OK", null, territorios).GetAllLastByStatus();
-   let convites = new Filters(null, "CONVITES", null, territorios).GetAllLastByStatus();
 
    //ORDERNAR TERRITORIOS POR DATA MAIS ANTIGA PARA A MAIS NOVA
 
@@ -424,7 +423,7 @@ export function getDevolucao() {
 
          var territorysAfterFilters = new Filters(brother, "ABERTO", day, territorys).Equals();
          var tlist = []
-         territorysAfterFilters.forEach((element, i) => {
+         territorysAfterFilters.forEach((element) => {
             const { Territorio, Devolucao } = element
 
             var dateDevolucao = new Date(Devolucao.split("/")[2], Devolucao.split("/")[1], Devolucao.split("/")[0])
