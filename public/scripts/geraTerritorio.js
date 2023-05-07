@@ -54,7 +54,6 @@ export function getData() {
                };
             }
 
-
             return {
                Territorio: currentTerritory.Territorio,
                Dirigente: e.Dirigente,
@@ -141,6 +140,9 @@ function gerar(territorios, casas, DirigenteSabado) {
    //OBTER APENAS TERRITORIOS OK
    let analisados = new Filters(null, "OK", null, territorios).GetAllLastByStatus();
 
+   analisados = analisados.filter(x => x.Dirigente != "SUPERINTENDENTE DE CIRCUITO - 23")
+
+   console.log(analisados.map(x=>x.Territorio))
    //ORDERNAR TERRITORIOS POR DATA MAIS ANTIGA PARA A MAIS NOVA
 
    analisados = analisados.sort((a, b) => {
@@ -157,6 +159,7 @@ function gerar(territorios, casas, DirigenteSabado) {
 
    let DaysForGeneration = []
    var temp = getOpen()
+
    let templeaderOfDomingo = []
 
    for (let i in temp) {
@@ -190,6 +193,10 @@ function gerar(territorios, casas, DirigenteSabado) {
    }
    //GERAR APENAS TERRITORIOS EM DIAS DIFERENTES AO ULTIMO TRABALHADO
    let ListaGerada = {};
+
+  
+
+  // DaysForGeneration = ['DOMINGO']
 
    DaysForGeneration.forEach(day => {
       ListaGerada[day] = analisados.filter((e) => e.DiaSemana != day).map((e) => {
@@ -521,7 +528,6 @@ class Filters {
    obterultimo(territorio) {
       return this.list.find((e) => e.Territorio == territorio).Rodadas
    }
-
 
    Equals() {
       return this.list.filter((e) => {
