@@ -5,9 +5,9 @@ import moment from 'moment/moment.js';
 const { readFile, utils } = xlsx;
 const { getJsDateFromExcel } = gts;
 
-const leaders = ["MARCOS MARQUES", "JOAO LIMA", "ARNALDO", "GERONIMO", "NATANAEL", "BRUNO", "SEBASTIAO", "FERNANDO", "ALEX", "VOLNEI", "ROGERIO"]
-const fieldDays = ["TERCA", "QUARTA", "QUINTA", "SEXTA", "SABADO", "DOMINGO"]
-const domLeaders = ["JOAO LIMA", "BRUNO", "ARNALDO", "VOLNEI"]
+const leaders = ["JOAO LIMA", "ARNALDO", "GERONIMO", "NATANAEL", "BRUNO", "SEBASTIAO", "FERNANDO", "ALEX", "ROGERIO","SANDRO"]
+const fieldDays = ["TERCA", "QUARTA", "SEXTA", "SABADO", "DOMINGO"]
+const domLeaders = ["JOAO LIMA", "SEBASTIAO", "ARNALDO", "SANDRO"]
 const terLeaders = ["FERNANDO", "SEBASTIAO"]
 const sexLeaders = ["ARNALDO"]
 const quiLeaders = ["GERONIMO", "NATANAEL"]
@@ -17,7 +17,7 @@ const currentDate = () => getCurrentDate();
 
 const UsarMenosTerritorios = false // caso seja false utilizara os mais antigos
 const devTest = false;
-const numMinCasas = 110
+const numMinCasas = 120
 const file = readFile(devTest ? './sheet/teste.xlsx' : './sheet/CONTROLE_DE_TERRITORIO_2022.xlsx')
 
 export function getData() {
@@ -130,9 +130,8 @@ function getNear(numTerritorio) {
 }
 
 
-export function Generate() {
-   return gerar(Latest(getData()), numMinCasas, sabLeader)
-}
+export const Generate = () => gerar(Latest(getData()), numMinCasas, sabLeader)
+
 function gerar(territorios, casas, DirigenteSabado) {
 
    let ret = {}
@@ -140,9 +139,9 @@ function gerar(territorios, casas, DirigenteSabado) {
    //OBTER APENAS TERRITORIOS OK
    let analisados = new Filters(null, "OK", null, territorios).GetAllLastByStatus();
 
-   analisados = analisados.filter(x => x.Dirigente != "SUPERINTENDENTE DE CIRCUITO - 23")
+   /* analisados = analisados.filter(x => x.Dirigente != "SUPERINTENDENTE DE CIRCUITO - 23") */
 
-   console.log(analisados.map(x=>x.Territorio))
+
    //ORDERNAR TERRITORIOS POR DATA MAIS ANTIGA PARA A MAIS NOVA
 
    analisados = analisados.sort((a, b) => {
@@ -154,11 +153,15 @@ function gerar(territorios, casas, DirigenteSabado) {
       return ADC.getTime() - BDC.getTime()
    })
 
-
+ /*   console.log(analisados.map(x => {
+      return {
+         territorio: x.Territorio, saida: (x.Saida_2 || x.Saida_1)
+      }
+   })) */
    //GERAR APENAS DIAS EM QUE NÃO HÁ TERRITÓRIOS ABERTOS - SEMANA e DOMINGO
 
    let DaysForGeneration = []
-   var temp = getOpen()
+   const temp = getOpen()
 
    let templeaderOfDomingo = []
 
@@ -194,9 +197,9 @@ function gerar(territorios, casas, DirigenteSabado) {
    //GERAR APENAS TERRITORIOS EM DIAS DIFERENTES AO ULTIMO TRABALHADO
    let ListaGerada = {};
 
-  
 
-  // DaysForGeneration = ['DOMINGO']
+
+   // DaysForGeneration = ['DOMINGO']
 
    DaysForGeneration.forEach(day => {
       ListaGerada[day] = analisados.filter((e) => e.DiaSemana != day).map((e) => {
@@ -437,7 +440,7 @@ export function getDevolucao() {
 
             if (dateDevolucao <= currentDate()) {  //filtro por data
                tlist.push(Territorio);
-               ret[day][brother] = { Devolucao, Territorios: tlist, mstT: day + " - " + tlist.join(','), msg: "Olá," + brother + "!, tudo bem? apenas lembrando o irmão de levar os territórios hoje na reunião, Caso esteja com outro irmão, favor mandar esse lembrete para ele." }
+               ret[day][brother] = { Devolucao, Territorios: tlist, mstT: day + " - " + tlist.join(','), msg: `Olá, ${String(brother).toLocaleLowerCase()}!, tudo bem?, referente aos territórios ${tlist} trabalhados no ${day}, chegou a fazer todos?`  }
             }
 
          });
